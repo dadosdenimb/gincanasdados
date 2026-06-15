@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caça ao Tesouro - Início</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(26,78,35,0.4) 0%, rgba(10,15,12,1) 80%);
+            color: #ffffff;
+            font-family: 'Fredoka', sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            background: rgba(15, 25, 18, 0.85);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #2bff00; 
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.3); 
+        }
+
+        .header-img {
+            width: 100%; 
+            max-width: 150px; /* Reduz consideravelmente o tamanho da logo */
+            height: auto; /* Mantém a proporção original */
+            margin: 0 auto 20px auto; /* Centraliza e adiciona margem inferior */
+            display: block;
+        }
+
+        h1 {
+            color: #fffb00; 
+            text-shadow: 3px 3px 0px #000;
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 35px;
+            letter-spacing: 1px;
+        }
+
+        .btn-link {
+            display: block;
+            width: 80%;
+            max-width: 400px;
+            margin: 20px auto;
+            text-decoration: none;
+            background: linear-gradient(135deg, #fffb00 0%, #ffc400 100%); 
+            color: #000000;
+            border: 2px solid #000;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px; 
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            text-transform: uppercase;
+            box-sizing: border-box;
+        }
+
+        .btn-link:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(57, 255, 20, 0.6); 
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <img src="logo.png" alt="Caça ao Tesouro" class="header-img">
+
+        <h1>MENU PRINCIPAL</h1>
+
+        <a href="segredo.html" class="btn-link">
+            Segredos
+        </a>
+
+        <a href="dicadotesouro.html" class="btn-link">
+            Dicas do Tesouro
+        </a>
+
+        <a href="roletapremiada.html" class="btn-link">
+            Roleta Premiada
+        </a>
+
+    </div>
+
+</body>
+</html>

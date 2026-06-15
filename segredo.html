@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qual é o Segredo do Tesouro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(26,78,35,0.4) 0%, rgba(10,15,12,1) 80%);
+            color: #ffffff;
+            font-family: 'Fredoka', sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            background: rgba(15, 25, 18, 0.85);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #2bff00; 
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.3);
+        }
+
+        .header-img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #fffb00; 
+            text-shadow: 3px 3px 0px #000;
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        /* Painel Digital estilo Rádio-Relógio */
+        #frase {
+            min-height: 120px;
+            font-family: 'Orbitron', monospace;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            padding: 25px;
+            border: 2px solid #efff14; 
+            border-radius: 15px;
+            background: #000000;
+            color: #efff14;
+            text-shadow: 0 0 10px rgba(239, 255, 20, 0.5);
+            box-shadow: inset 0 0 20px rgba(57, 255, 20, 0.2);
+            margin-bottom: 30px;
+            word-wrap: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        button {
+            background: linear-gradient(135deg, #39ff14 0%, #1b9a07 100%); /* Padrão Inicial Verde */
+            color: white;
+            text-shadow: 1px 1px 2px #000;
+            border: 2px solid #000;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px; 
+            cursor: pointer;
+            transition: background 0.3s, transform 0.3s;
+            box-shadow: 0 5px 15px rgba(57, 255, 20, 0.4);
+            text-transform: uppercase;
+        }
+
+        button:hover:not(:disabled) {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(57, 255, 20, 0.6); 
+        }
+
+        /* Classe para transformar o botão em vermelho no Erro */
+        button.erro-btn {
+            background: linear-gradient(135deg, #ff4444 0%, #990000 100%) !important;
+            box-shadow: 0 5px 15px rgba(255, 68, 68, 0.4) !important;
+        }
+        button.erro-btn:hover:not(:disabled) {
+            box-shadow: 0 8px 25px rgba(255, 68, 68, 0.6) !important;
+        }
+
+        button:disabled {
+            background: #444 !important;
+            color: #888 !important;
+            border-color: #222 !important;
+            cursor: not-allowed;
+            box-shadow: none !important;
+            transform: none !important;
+        }
+
+        /* Input Digital fixado com borda sempre verde */
+        input {
+            margin-bottom: 25px;
+            padding: 15px;
+            width: 280px;
+            border-radius: 50px;
+            border: 3px solid #2bff00; /* Sempre Verde */
+            background: #000000;
+            font-family: 'Orbitron', monospace;
+            color: #ffffff; /* Números Brancos */
+            font-size: 1.5rem;
+            letter-spacing: 4px;
+            text-align: center;
+            outline: none;
+            box-sizing: border-box;
+            box-shadow: 0 0 15px rgba(43, 255, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        input:focus {
+            border-color: #2bff00;
+            box-shadow: 0 0 20px rgba(43, 255, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <img src="headtesouro.png" alt="Caça ao Tesouro" class="header-img">
+
+        <h1>Qual é o Segredo do Tesouro</h1>
+
+        <div id="frase">
+            INSIRA O SEGREDO DE 6 DIGITOS
+        </div>
+
+        <div id="senhaArea">
+            <input 
+                type="text"
+                id="senhaInput"
+                placeholder="000000"
+                maxlength="6"
+                pattern="\d*"
+                inputmode="numeric"
+                autocomplete="off"
+            >
+
+            <br>
+
+            <button id="botaoAcao">
+                Confirmar Palpite
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        const SENHA_CORRETA = "402573";
+        const SENHA_RESET = "0000";
+        const CARACTERES_DECODIFICACAO = "0123456789X#@$%&*!?";
+
+        const fraseElemento = document.getElementById("frase");
+        const senhaInput = document.getElementById("senhaInput");
+        const botaoAcao = document.getElementById("botaoAcao");
+
+        let estadoErro = false; // Controla se o botão está no modo "Tente Novamente"
+
+        botaoAcao.addEventListener("click", gerenciarClique);
+
+        // Permite validar ao apertar Enter
+        senhaInput.addEventListener("keypress", (e) => {
+            if (e.key === "Enter" && !botaoAcao.disabled) {
+                gerenciarClique();
+            }
+        });
+
+        // Bloqueia caracteres não numéricos direto no teclado do usuário
+        senhaInput.addEventListener("input", (e) => {
+            e.target.value = e.target.value.replace(/\D/g, "");
+        });
+
+        function gerenciarClique() {
+            if (!estadoErro) {
+                processarPalpite();
+            } else {
+                processarReset();
+            }
+        }
+
+        function processarPalpite() {
+            const palpite = senhaInput.value;
+
+            if (palpite.length !== 6) {
+                aplicarEstiloMensagem("ERRO: DIGITE 6 NUMEROS", "#ff4444");
+                return;
+            }
+
+            // Desabilita controles durante o processo de 5 segundos
+            botaoAcao.disabled = true;
+            senhaInput.disabled = true;
+
+            const ehCorreto = (palpite === SENHA_CORRETA);
+            const textoFinal = ehCorreto 
+                ? "Parabéns, você ganhou conquistou o Tesouro do Dados!" 
+                : "Segredo Incorreto: Tente Novamente";
+
+            const duracaoAnimacao = 5000; 
+            const intervaloAtualizacao = 60; 
+            const tempoInicio = Date.now();
+
+            // Reseta estilo para o "modo processamento" (Amarelo)
+            aplicarEstiloMensagem("", "#efff14");
+
+            const loopDecodificacao = setInterval(() => {
+                const tempoDecorrido = Date.now() - tempoInicio;
+                
+                let textoMatriz = "";
+                // Mantém o tamanho simulado baseado no tamanho da frase final de forma puramente embaralhada
+                for (let i = 0; i < textoFinal.length; i++) {
+                    if (textoFinal[i] === " ") {
+                        textoMatriz += " ";
+                    } else {
+                        textoMatriz += CARACTERES_DECODIFICACAO[Math.floor(Math.random() * CARACTERES_DECODIFICACAO.length)];
+                    }
+                }
+                fraseElemento.innerText = textoMatriz;
+
+                // Fim dos 5 segundos de decodificação
+                if (tempoDecorrido >= duracaoAnimacao) {
+                    clearInterval(loopDecodificacao);
+                    
+                    if (ehCorreto) {
+                        aplicarEstiloMensagem(textoFinal, "#39ff14"); // Verde
+                        botaoAcao.style.display = "none"; // Faz sumir o botão completamente
+                        senhaInput.value = "";
+                        dispararFestaConfete();
+                    } else {
+                        aplicarEstiloMensagem(textoFinal, "#ff4444"); // Vermelho
+                        
+                        // Configura o botão para o modo de falha/erro
+                        estadoErro = true;
+                        botaoAcao.innerText = "Tente Novamente";
+                        botaoAcao.classList.add("erro-btn");
+                        
+                        // Libera os campos para a nova ação
+                        botaoAcao.disabled = false;
+                        senhaInput.disabled = false;
+                        senhaInput.value = "";
+                        senhaInput.placeholder = "0000";
+                        senhaInput.setAttribute("maxlength", "4"); // Altera o limite para 4 números temporariamente
+                        senhaInput.focus();
+                    }
+                }
+            }, intervaloAtualizacao);
+        }
+
+        function processarReset() {
+            const palpiteReset = senhaInput.value;
+
+            if (palpiteReset === SENHA_RESET) {
+                // Se digitou 0000 corretamente, recarrega a página inteira
+                window.location.reload();
+            } else {
+                aplicarEstiloMensagem("SISTEMA FALHOU. DIGITE A SENHA DE SEGURANÇA PARA REATIVAR", "#ff4444");
+                senhaInput.value = "";
+                senhaInput.focus();
+            }
+        }
+
+        // Função utilitária para mudar o display digital
+        function aplicarEstiloMensagem(texto, corHex) {
+            if (texto) fraseElemento.innerText = texto;
+            fraseElemento.style.color = corHex;
+            fraseElemento.style.borderColor = corHex;
+            fraseElemento.style.textShadow = `0 0 12px ${corHex}`;
+        }
+
+        // Chuva de papel picado nas cores especificadas: Verde, Amarelo, Branco e Vermelho
+        function dispararFestaConfete() {
+            const duracaoFesta = 6000; 
+            const fimFesta = Date.now() + duracaoFesta;
+            const coresPersonalizadas = ['#39ff14', '#fffb00', '#ffffff', '#ff4444'];
+
+            (function frameConfete() {
+                confetti({
+                    particleCount: 4,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.8 },
+                    colors: coresPersonalizadas
+                });
+                confetti({
+                    particleCount: 4,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.8 },
+                    colors: coresPersonalizadas
+                });
+
+                if (Date.now() < fimFesta) {
+                    requestAnimationFrame(frameConfete);
+                }
+            }());
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Roleta de Prêmios</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Layout de fundo do Código 2 com tratamento de overflow para os confetes */
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle, rgba(26,78,35,0.4) 0%, rgba(10,15,12,1) 80%);
+            color: #ffffff;
+            font-family: 'Fredoka', sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+            overflow-x: hidden;
+        }
+
+        /* Container principal do Código 2 */
+        .container {
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            background: rgba(15, 25, 18, 0.85);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #2bff00; 
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.3); 
+            box-sizing: border-box;
+        }
+
+        /* Estilo da imagem logo.png acima do título */
+        .header-img {
+            width: 100%; 
+            max-width: 150px; 
+            height: auto; 
+            margin: 0 auto 20px auto; 
+            display: block;
+        }
+
+        /* Título h1 estilizado conforme o Código 2 */
+        h1 {
+            color: #fffb00; 
+            text-shadow: 3px 3px 0px #000;
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 35px;
+            letter-spacing: 1px;
+        }
+
+        /* Elementos estruturais da roleta (Código 1) devidamente centralizados */
+        .roleta-container {
+            position: relative;
+            width: 90vw;
+            height: 90vw;
+            max-width: 500px;
+            max-height: 500px;
+            margin: 0 auto 25px auto;
+        }
+
+        #seta {
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: clamp(15px, 4vw, 25px) solid transparent;
+            border-right: clamp(15px, 4vw, 25px) solid transparent;
+            border-top: clamp(30px, 8vw, 50px) solid gold;
+            z-index: 10;
+        }
+
+        canvas {
+            background: #111;
+            border-radius: 50%;
+            border: clamp(4px, 1.5vw, 8px) solid #444;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Botões redesenhados com o layout CSS do Código 2 (.btn-link) */
+        button {
+            display: block;
+            width: 80%;
+            max-width: 400px;
+            margin: 20px auto;
+            text-decoration: none;
+            background: linear-gradient(135deg, #fffb00 0%, #ffc400 100%); 
+            color: #000000;
+            border: 2px solid #000;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px; 
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            text-transform: uppercase;
+            box-sizing: border-box;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(57, 255, 20, 0.6); 
+        }
+
+        /* Div de resultado adaptada para o esquema de cores atual */
+        #resultado {
+            margin-top: 25px;
+            font-size: clamp(20px, 5vw, 28px);
+            font-weight: bold;
+            color: #fffb00;
+            min-height: 35px;
+            text-shadow: 2px 2px 0px #000;
+            text-align: center;
+        }
+
+        /* Animação de confetes do Código 1 */
+        .confeti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            top: -20px;
+            z-index: 999;
+            pointer-events: none;
+            animation: cair linear forwards;
+        }
+
+        @keyframes cair {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(105vh) rotate(720deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        
+        <img src="logo.png" alt="Logo" class="header-img">
+
+        <h1>🎲✨ ROLETA PREMIADA ✨🎲</h1>
+
+        <div class="roleta-container">
+            <div id="seta"></div>
+            <canvas id="roleta"></canvas>
+        </div>
+
+        <button id="girar">GIRAR ROLETA</button>
+        <button id="resetar" style="display: none;">GIRAR NOVAMENTE</button>
+
+        <div id="resultado"></div>
+
+    </div>
+
+<script>
+// =========================================================================
+// CONFIGURAÇÃO DE PRÊMIOS, CORES E PROBABILIDADES
+// =========================================================================
+const configPremios = [
+    { nome: "VALE DRINK",    cor: "#006c18", peso: 9 },
+    { nome: "DICA DO TESOURO",  cor: "#fbd400", peso: 15  },
+    { nome: "CHOPE DE VINHO",         cor: "#d61c1c", peso: 12},
+    { nome: "VALE SHOT",      cor: "#ffffff", peso: 19},
+    { nome: "DICA DO TESOURO",          cor: "#006c18", peso: 19},
+    { nome: "CHOPE PILSEN",     cor: "#fbd400", peso: 15},
+    { nome: "BOLACHA M&D", cor: "#d61c1c", peso: 10}, 
+    { nome: "VOUCHER R$ 150",   cor: "#ffffff", peso: 1  }  
+];
+
+const premios = configPremios.map(p => p.nome);
+
+const canvas = document.getElementById("roleta");
+const ctx = canvas.getContext("2d");
+
+let largura, altura, centroX, centroY, raio;
+let rAtualRad = 0; 
+let girando = false;
+
+const btnGirarReal = document.getElementById("girar");
+const btnResetar = document.getElementById("resetar");
+const divResultado = document.getElementById("resultado");
+
+// Pré-carregamento da Logomarca Central
+const logoImg = new Image();
+logoImg.src = "logo.png"; 
+logoImg.onload = () => {
+    desenharRoleta(rAtualRad);
+};
+
+// =========================================================================
+// RESPONSIVIDADE DINÂMICA DO CANVAS
+// =========================================================================
+function ajustarTamanhoCanvas() {
+    const container = document.querySelector('.roleta-container');
+    const tamanhoDinamico = container.clientWidth;
+
+    canvas.width = tamanhoDinamico * 2;
+    canvas.height = tamanhoDinamico * 2;
+
+    largura = canvas.width;
+    altura = canvas.height;
+    centroX = largura / 2;
+    centroY = altura / 2;
+    raio = (largura / 2) - (largura * 0.02);
+
+    desenharRoleta(rAtualRad);
+}
+
+window.addEventListener('resize', ajustarTamanhoCanvas);
+
+// ================================
+// DESENHAR ROLETA
+// ================================
+function desenharRoleta(rotacao = 0){
+    const total = configPremios.length;
+    const angulo = (Math.PI * 2) / total;
+
+    ctx.clearRect(0,0,largura,altura);
+
+    for(let i=0; i<total; i++){
+        const inicio = i * angulo + rotacao;
+        const fim = inicio + angulo;
+
+        ctx.beginPath();
+        ctx.moveTo(centroX, centroY);
+        ctx.arc(centroX, centroY, raio, inicio, fim);
+        ctx.fillStyle = configPremios[i].cor;
+        ctx.fill();
+
+        ctx.save();
+        ctx.translate(centroX, centroY);
+        ctx.rotate(inicio + angulo/2);
+
+        ctx.fillStyle = (configPremios[i].cor === "#ffffff") ? "#111111" : "white";
+        
+        const tamanhoFonte = Math.floor(largura * 0.034);
+        // Fonte atualizada internamente no canvas para harmonizar com o layout
+        ctx.font = `bold ${tamanhoFonte}px 'Fredoka', sans-serif`;
+        ctx.textAlign = "right";
+        ctx.fillText(configPremios[i].nome, raio - (largura * 0.05), tamanhoFonte * 0.3);
+        ctx.restore();
+    }
+
+    // Miolo Central com o Logo
+    const raioMiolo = largura * 0.1; 
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(centroX, centroY, raioMiolo, 0, Math.PI * 2);
+    ctx.fillStyle = "#111111";
+    ctx.fill();
+    ctx.clip();
+
+    if (logoImg.complete && logoImg.naturalWidth !== 0) {
+        ctx.drawImage(logoImg, centroX - raioMiolo, centroY - raioMiolo, raioMiolo * 2, raioMiolo * 2);
+    }
+    ctx.restore();
+
+    ctx.beginPath();
+    ctx.arc(centroX, centroY, raioMiolo, 0, Math.PI * 2);
+    ctx.strokeStyle = "gold";
+    ctx.lineWidth = Math.max(2, largura * 0.006);
+    ctx.stroke();
+}
+
+ajustarTamanhoCanvas();
+
+// ================================
+// SISTEMA DE CHUVA DE CONFETES
+// ================================
+function dispararChuvaConfeti() {
+    const totalConfetes = 120;
+    const coresConfeti = ['#ff595e', '#ff924c', '#ffca3a', '#8ac926', '#1982c4', '#f72585', '#ffffff'];
+
+    for (let i = 0; i < totalConfetes; i++) {
+        const confeti = document.createElement('div');
+        confeti.classList.add('confeti');
+
+        confeti.style.left = Math.random() * 100 + 'vw';
+        confeti.style.backgroundColor = coresConfeti[Math.floor(Math.random() * coresConfeti.length)];
+        confeti.style.width = Math.random() * 8 + 6 + 'px';
+        confeti.style.height = Math.random() * 12 + 8 + 'px';
+        
+        const duracaoQueda = Math.random() * 2 + 2;
+        confeti.style.animationDuration = duracaoQueda + 's';
+        confeti.style.animationDelay = Math.random() * 0.5 + 's';
+
+        document.body.appendChild(confeti);
+
+        setTimeout(() => {
+            confeti.remove();
+        }, (duracaoQueda + 0.5) * 1000);
+    }
+}
+
+// ====================================
+// SORTEIO BASEADO EM PROBABILIDADE (PESO)
+// ====================================
+function sortearPremioPorPeso() {
+    const pesoTotal = configPremios.reduce((soma, item) => soma + item.peso, 0);
+    let numeroAleatorio = Math.random() * pesoTotal;
+    
+    for (let i = 0; i < configPremios.length; i++) {
+        if (numeroAleatorio < configPremios[i].peso) {
+            return i; 
+        }
+        numeroAleatorio -= configPremios[i].peso;
+    }
+    return 0;
+}
+
+// ================================
+// AÇÃO: GIRAR ROLETA
+// ================================
+btnGirarReal.addEventListener("click", () => {
+    if(girando) return;
+    girando = true;
+    
+    divResultado.innerHTML = "";
+
+    const premioEscolhidoIdx = sortearPremioPorPeso();
+    const totalFatias = configPremios.length;
+    const tamanhoFatiaRad = (Math.PI * 2) / totalFatias;
+
+    // Alinhamento perfeito em 270 graus (topo da seta)
+    const anguloAlvoFatia = (1.5 * Math.PI) - (premioEscolhidoIdx * tamanhoFatiaRad) - (tamanhoFatiaRad / 2);
+    const anguloDestinoFinal = (anguloAlvoFatia % (Math.PI * 2) + (Math.PI * 2)) % (Math.PI * 2);
+    
+    const voltasEmRad = Math.PI * 2 * 40; 
+    const fRotacaoFinalRad = anguloDestinoFinal + voltasEmRad;
+
+    const inicioTempo = performance.now();
+    const duracao = 21000; 
+
+    function animar(tempoAtual){
+        const decorrido = tempoAtual - inicioTempo;
+        const progresso = Math.min(decorrido / duracao, 1);
+
+        const easeOut = 1 - Math.pow(1 - progresso, 3.5);
+
+        rAtualRad = (fRotacaoFinalRad * easeOut);
+
+        desenharRoleta(rAtualRad % (Math.PI * 2));
+
+        if(progresso < 1){
+            requestAnimationFrame(animar);
+        } else {
+            girando = false;
+            
+            rAtualRad = anguloDestinoFinal;
+            desenharRoleta(rAtualRad);
+            
+            divResultado.innerHTML = "🎉 Resultado: " + premios[premioEscolhidoIdx];
+            dispararChuvaConfeti();
+
+            btnGirarReal.style.display = "none";
+            btnResetar.style.display = "block"; /* Ajustado para manter compatibilidade com display block */
+        }
+    }
+
+    requestAnimationFrame(animar);
+});
+
+// ================================
+// AÇÃO: LIBERAR NOVA RODADA (SENHA)
+// ================================
+btnResetar.addEventListener("click", () => {
+    const senha = prompt("Digite a senha de administrador para liberar uma nova rodada:");
+    
+    if (senha === "123456") {
+        divResultado.innerHTML = "";
+        btnResetar.style.display = "none";
+        btnGirarReal.style.display = "block"; /* Ajustado para manter compatibilidade com display block */
+    } else {
+        alert("Senha incorreta! Acesso negado.");
+    }
+});
+</script>
+
+</body>
+</html>

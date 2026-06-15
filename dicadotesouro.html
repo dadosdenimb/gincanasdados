@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Caça ao Tesouro - Sistema de Decodificação</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Fundo escuro com uma aura centralizada verde/dourada simulando a magia da imagem */
+            background: radial-gradient(circle, rgba(26,78,35,0.4) 0%, rgba(10,15,12,1) 80%);
+            color: #ffffff;
+            font-family: 'Fredoka', sans-serif;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            text-align: center;
+            background: rgba(15, 25, 18, 0.85);
+            padding: 30px;
+            border-radius: 20px;
+            border: 3px solid #2bff00; /* Borda Dourada */
+            box-shadow: 0 0 30px rgba(57, 255, 20, 0.3); /* Brilho Verde */
+        }
+
+        .header-img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            color: #fffb00; /* Amarelo da imagem */
+            text-shadow: 3px 3px 0px #000;
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 25px;
+            letter-spacing: 1px;
+        }
+
+        #frase {
+            min-height: 100px;
+            font-size: 1.5rem;
+            padding: 25px;
+            border: 1px solid #efff14; /* Verde Limão vibrante */
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #ffffff;
+            text-shadow: 1px 1px 2px #000;
+            box-shadow: inset 0 0 15px rgba(57, 255, 20, 0.2);
+            margin-bottom: 30px;
+            word-wrap: break-word;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        button {
+            background: linear-gradient(135deg, #fffb00 0%, #ffc400 100%); /* Gradiente Amarelo/Dourado */
+            color: #000000;
+            border: 2px solid #000;
+            padding: 15px 35px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            border-radius: 50px; /* Botões mais arredondados */
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            text-transform: uppercase;
+        }
+
+        button:hover {
+            transform: scale(1.05) translateY(-2px);
+            box-shadow: 0 8px 25px rgba(57, 255, 20, 0.6); /* Brilho verde no hover */
+        }
+
+        button:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        input {
+            margin-top: 20px;
+            padding: 15px;
+            width: 260px;
+            border-radius: 50px;
+            border: 3px solid #ff4444; /* Vermelho focado no "Senha Secreta" da imagem */
+            background: #111;
+            color: #fff;
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            text-align: center;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.2);
+            box-sizing: border-box;
+        }
+        
+        input:focus {
+            border-color: #fffb00;
+            box-shadow: 0 0 15px rgba(255, 251, 0, 0.5);
+        }
+
+        #senhaArea {
+            display: none;
+            margin-top: 25px;
+        }
+
+        #confirmarSenha {
+            background: linear-gradient(135deg, #39ff14 0%, #1b9a07 100%); /* Botão de confirmação em Verde */
+            color: white;
+            text-shadow: 1px 1px 2px #000;
+            margin-top: 15px;
+        }
+
+        #mensagemErro {
+            color: #ff4444;
+            font-weight: 700;
+            margin-top: 15px;
+            min-height: 20px;
+            text-shadow: 1px 1px 1px #000;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+
+        <img src="headtesouro.png" alt="Caça ao Tesouro" class="header-img">
+
+        <h1>PISTAS PARA O TESOURO</h1>
+
+        <div id="frase">
+            Clique em "GERAR PISTA" para revelar uma pista.
+        </div>
+
+        <button id="botaoPrincipal">
+            GERAR PISTA
+        </button>
+
+        <div id="senhaArea">
+
+            <input 
+                type="password"
+                id="senhaInput"
+                placeholder="Digite a senha"
+            >
+
+            <br>
+
+            <button id="confirmarSenha">
+                CONFIRMAR SENHA
+            </button>
+
+            <div id="mensagemErro"></div>
+
+        </div>
+
+    </div>
+
+    <script>
+        const frases = [
+            "Pista 1 - Assim como os amigos de FRIENDS, os números do segredo também são únicos",
+            "Pista 2 - Aquele que foi forjado para todos dominar não aparece no segredo",
+            "Pista 3 - Junte as três trilogias de Star Wars e suma com elas do segredo",
+            "Pista 4 - A metade de oito está em algum lugar do segredo, mas ele não",
+            "Pista 5 - O quinto é a soma dos dois do meio",
+            "Pista 6 - Antes das Tartarugas Ninjas não tem ninguém",
+            "Pista 7 - A água congela em uma casa par",
+            "Pista 8 - Os Cavaleiros de bronze que subiram as dose casas se encontram em algum lugar antes dos Pecados Capitais",
+            "Pista 9 - Os mosqueteiros chegaram por último",
+            "Pista 10 - Os Sóis de Tattooine nascem antes dos dedos de uma mão",
+            "Pista 11 - O segundo lugar não é nada",
+            "Pista 12 - Primeiro vem os Beatles, muito depois vem o Nirvana",
+            "Pista 13 - Primeiro invoque Sheng Long e depois realize os três desejos",
+            "Pista 14 - Some o terceiro e o último e você terá o quarto",
+            "Pista 15 - As Horcruxes de Voldemort estão mais próximas do final do que do início",
+            "Pista 16 - Do segundo ao quinto ele sobe sem tropeçar, depois desce quadro degraus",
+            "Pista 17 - No segredo o Hexa não vem",
+            "Pista 18 - O segundo é o menor de todos",
+            "Pista 19 - O segredo tem três ímpares e o maior encontra-se à esquerda do menor",
+            "Pista 20 - Os três pares vem antes"
+        ];
+
+        const caracteres = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*!?<>/";
+
+        const fraseElemento = document.getElementById("frase");
+        const botaoPrincipal = document.getElementById("botaoPrincipal");
+        const senhaArea = document.getElementById("senhaArea");
+        const senhaInput = document.getElementById("senhaInput");
+        const confirmarSenha = document.getElementById("confirmarSenha");
+        const mensagemErro = document.getElementById("mensagemErro");
+
+        let modoSenha = false;
+
+        botaoPrincipal.addEventListener("click", () => {
+            if (!modoSenha) {
+                decodificarFrase();
+            } else {
+                mostrarSenha();
+            }
+        });
+
+        confirmarSenha.addEventListener("click", verificarSenha);
+
+        function decodificarFrase() {
+            const fraseFinal = frases[Math.floor(Math.random() * frases.length)];
+            botaoPrincipal.disabled = true;
+
+            const duracao = 5000;
+            const intervalo = 50;
+            const inicio = Date.now();
+
+            const animacao = setInterval(() => {
+                const tempoPassado = Date.now() - inicio;
+                const progresso = tempoPassado / duracao;
+
+                let textoAtual = "";
+
+                for (let i = 0; i < fraseFinal.length; i++) {
+                    if (fraseFinal[i] === " ") {
+                        textoAtual += " ";
+                        continue;
+                    }
+
+                    if (i < fraseFinal.length * progresso) {
+                        textoAtual += fraseFinal[i];
+                    } else {
+                        textoAtual += caracteres[Math.floor(Math.random() * caracteres.length)];
+                    }
+                }
+
+                fraseElemento.innerText = textoAtual;
+
+                if (tempoPassado >= duracao) {
+                    clearInterval(animacao);
+                    fraseElemento.innerText = fraseFinal;
+                    botaoPrincipal.disabled = false;
+                    botaoPrincipal.innerText = "GERAR NOVA PISTA";
+                    modoSenha = true;
+                }
+            }, intervalo);
+        }
+
+        function mostrarSenha() {
+            senhaArea.style.display = "block";
+            senhaInput.focus();
+        }
+
+        function verificarSenha() {
+            if (senhaInput.value === "123456") {
+                senhaArea.style.display = "none";
+                senhaInput.value = "";
+                mensagemErro.innerText = "";
+                fraseElemento.innerText = "Senha aceita. Clique em GERAR PISTA para revelar outra pista.";
+                botaoPrincipal.innerText = "GERAR PISTA";
+                modoSenha = false;
+            } else {
+                mensagemErro.innerText = "Senha incorreta.";
+            }
+        }
+    </script>
+
+</body>
+</html>

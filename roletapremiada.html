@@ -1,173 +1,137 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roleta de Prêmios</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roleta de Prêmios</title>
 
-    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body {
+    margin: 0;
+    padding: 20px 10px;
+    background: #01240f;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+    color: white;
+    overflow-x: hidden;
+}
 
-    <style>
-        /* Layout de fundo do Código 2 com tratamento de overflow para os confetes */
-        body {
-            margin: 0;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: radial-gradient(circle, rgba(26,78,35,0.4) 0%, rgba(10,15,12,1) 80%);
-            color: #ffffff;
-            font-family: 'Fredoka', sans-serif;
-            padding: 20px;
-            box-sizing: border-box;
-            overflow-x: hidden;
-        }
+h1 {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+}
 
-        /* Container principal do Código 2 */
-        .container {
-            width: 100%;
-            max-width: 700px;
-            text-align: center;
-            background: rgba(15, 25, 18, 0.85);
-            padding: 30px;
-            border-radius: 20px;
-            border: 3px solid #2bff00; 
-            box-shadow: 0 0 30px rgba(57, 255, 20, 0.3); 
-            box-sizing: border-box;
-        }
+.roleta-container {
+    position: relative;
+    width: 90vw;
+    height: 90vw;
+    max-width: 500px;
+    max-height: 500px;
+}
 
-        /* Estilo da imagem logo.png acima do título */
-        .header-img {
-            width: 100%; 
-            max-width: 150px; 
-            height: auto; 
-            margin: 0 auto 20px auto; 
-            display: block;
-        }
+#seta {
+    position: absolute;
+    top: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: clamp(15px, 4vw, 25px) solid transparent;
+    border-right: clamp(15px, 4vw, 25px) solid transparent;
+    border-top: clamp(30px, 8vw, 50px) solid gold;
+    z-index: 10;
+}
 
-        /* Título h1 estilizado conforme o Código 2 */
-        h1 {
-            color: #fffb00; 
-            text-shadow: 3px 3px 0px #000;
-            font-size: 2rem;
-            margin-top: 0;
-            margin-bottom: 35px;
-            letter-spacing: 1px;
-        }
+canvas {
+    background: #111;
+    border-radius: 50%;
+    border: clamp(4px, 1.5vw, 8px) solid #444;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+    width: 100%;
+    height: 100%;
+    display: block;
+}
 
-        /* Elementos estruturais da roleta (Código 1) devidamente centralizados */
-        .roleta-container {
-            position: relative;
-            width: 90vw;
-            height: 90vw;
-            max-width: 500px;
-            max-height: 500px;
-            margin: 0 auto 25px auto;
-        }
+.btn-container {
+    margin-top: 25px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
 
-        #seta {
-            position: absolute;
-            top: -8px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: clamp(15px, 4vw, 25px) solid transparent;
-            border-right: clamp(15px, 4vw, 25px) solid transparent;
-            border-top: clamp(30px, 8vw, 50px) solid gold;
-            z-index: 10;
-        }
+button {
+    padding: 12px 30px;
+    font-size: clamp(18px, 4vw, 22px);
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    background: gold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+    white-space: nowrap;
+}
 
-        canvas {
-            background: #111;
-            border-radius: 50%;
-            border: clamp(4px, 1.5vw, 8px) solid #444;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
-            width: 100%;
-            height: 100%;
-            display: block;
-        }
+button:hover {
+    transform: scale(1.05);
+}
 
-        /* Botões redesenhados com o layout CSS do Código 2 (.btn-link) */
-        button {
-            display: block;
-            width: 80%;
-            max-width: 400px;
-            margin: 20px auto;
-            text-decoration: none;
-            background: linear-gradient(135deg, #fffb00 0%, #ffc400 100%); 
-            color: #000000;
-            border: 2px solid #000;
-            padding: 15px 35px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            border-radius: 50px; 
-            cursor: pointer;
-            transition: 0.3s;
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
-            text-transform: uppercase;
-            box-sizing: border-box;
-            font-family: 'Fredoka', sans-serif;
-        }
+#resultado {
+    margin-top: 20px;
+    font-size: clamp(20px, 5vw, 28px);
+    font-weight: bold;
+    color: gold;
+    min-height: 35px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.8);
+    text-align: center;
+}
 
-        button:hover {
-            transform: scale(1.05) translateY(-2px);
-            box-shadow: 0 8px 25px rgba(57, 255, 20, 0.6); 
-        }
+.confeti {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    top: -20px;
+    z-index: 999;
+    pointer-events: none;
+    animation: cair linear forwards;
+}
 
-        /* Div de resultado adaptada para o esquema de cores atual */
-        #resultado {
-            margin-top: 25px;
-            font-size: clamp(20px, 5vw, 28px);
-            font-weight: bold;
-            color: #fffb00;
-            min-height: 35px;
-            text-shadow: 2px 2px 0px #000;
-            text-align: center;
-        }
-
-        /* Animação de confetes do Código 1 */
-        .confeti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            top: -20px;
-            z-index: 999;
-            pointer-events: none;
-            animation: cair linear forwards;
-        }
-
-        @keyframes cair {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(105vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-    </style>
+@keyframes cair {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(105vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+</style>
 </head>
 <body>
 
-    <div class="container">
-        
-        <img src="logo.png" alt="Logo" class="header-img">
+<h1>🎲✨ ROLETA PREMIADA ✨🎲</h1>
 
-        <h1> </h1>
+<div class="roleta-container">
+    <div id="seta"></div>
+    <canvas id="roleta"></canvas>
+</div>
 
-        <div class="roleta-container">
-            <div id="seta"></div>
-            <canvas id="roleta"></canvas>
-        </div>
+<div class="btn-container">
+    <button id="girar">GIRAR ROLETA</button>
+    <button id="resetar" style="display: none;">GIRAR NOVAMENTE</button>
+</div>
 
-        <button id="girar">GIRAR ROLETA</button>
-        <button id="resetar" style="display: none;">GIRAR NOVAMENTE</button>
-
-        <div id="resultado"></div>
-
-    </div>
+<div id="resultado"></div>
 
 <script>
 // =========================================================================
@@ -251,8 +215,7 @@ function desenharRoleta(rotacao = 0){
         ctx.fillStyle = (configPremios[i].cor === "#ffffff") ? "#111111" : "white";
         
         const tamanhoFonte = Math.floor(largura * 0.034);
-        // Fonte atualizada internamente no canvas para harmonizar com o layout
-        ctx.font = `bold ${tamanhoFonte}px 'Fredoka', sans-serif`;
+        ctx.font = `bold ${tamanhoFonte}px Arial`;
         ctx.textAlign = "right";
         ctx.fillText(configPremios[i].nome, raio - (largura * 0.05), tamanhoFonte * 0.3);
         ctx.restore();
@@ -342,20 +305,26 @@ btnGirarReal.addEventListener("click", () => {
     const anguloAlvoFatia = (1.5 * Math.PI) - (premioEscolhidoIdx * tamanhoFatiaRad) - (tamanhoFatiaRad / 2);
     const anguloDestinoFinal = (anguloAlvoFatia % (Math.PI * 2) + (Math.PI * 2)) % (Math.PI * 2);
     
+    // Aumentado proporcionalmente para manter a arrancada inicial super veloz
     const voltasEmRad = Math.PI * 2 * 40; 
     const fRotacaoFinalRad = anguloDestinoFinal + voltasEmRad;
 
     const inicioTempo = performance.now();
+    
+    // TEMPO REDUZIDO EM 30%: Mudado de 30s para 21s (21000ms)
     const duracao = 21000; 
 
     function animar(tempoAtual){
         const decorrido = tempoAtual - inicioTempo;
         const progresso = Math.min(decorrido / duracao, 1);
 
+        // NOVA SOLUÇÃO DE FÍSICA: Cubic Ease Out Customizado
+        // Garante perda de força orgânica perfeita. A velocidade zera exatamente junto com o tempo!
         const easeOut = 1 - Math.pow(1 - progresso, 3.5);
 
         rAtualRad = (fRotacaoFinalRad * easeOut);
 
+        // Renderiza o movimento real puro baseado no tempo decorrido
         desenharRoleta(rAtualRad % (Math.PI * 2));
 
         if(progresso < 1){
@@ -363,14 +332,16 @@ btnGirarReal.addEventListener("click", () => {
         } else {
             girando = false;
             
+            // Grava a posição exata de parada de forma invisível para a próxima rodada começar do mesmo lugar
             rAtualRad = anguloDestinoFinal;
             desenharRoleta(rAtualRad);
             
+            // Disparo instantâneo e síncrono
             divResultado.innerHTML = "🎉 Resultado: " + premios[premioEscolhidoIdx];
             dispararChuvaConfeti();
 
             btnGirarReal.style.display = "none";
-            btnResetar.style.display = "block"; /* Ajustado para manter compatibilidade com display block */
+            btnResetar.style.display = "inline-block";
         }
     }
 
@@ -386,7 +357,7 @@ btnResetar.addEventListener("click", () => {
     if (senha === "123456") {
         divResultado.innerHTML = "";
         btnResetar.style.display = "none";
-        btnGirarReal.style.display = "block"; /* Ajustado para manter compatibilidade com display block */
+        btnGirarReal.style.display = "inline-block";
     } else {
         alert("Senha incorreta! Acesso negado.");
     }
